@@ -1,0 +1,45 @@
+version: '2'
+services:
+  web:
+    image: nginx:1.11-alpine
+    links:
+      - php
+    ports:
+      - "9999:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    volumes_from:
+      - php
+  php:
+    build: php-7.0-fpm-custom
+    environment:
+      - TYPO3_CONTEXT=Development/Docker
+    links:
+      - db
+      - redis
+    volumes:
+      - ./htdocs:/var/www/html
+  db:
+    image: 'mariadb'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=root
+  redis:
+    image: redis:3.2
+
+  phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin'
+    restart: always
+    ports:
+       - "8080:80"
+    links:
+        - db
+        - php
+    environment:
+        - MYSQL_USERNAME=root
+        - MYSQL_ROOT_PASSWORD=root
+        - PMA_HOST=db
+

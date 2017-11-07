@@ -1,0 +1,3 @@
+run server:
+
+node server
